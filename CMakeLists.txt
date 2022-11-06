@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 project(islands_circuit_designer)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME} main.cpp file_actions.cpp external/tinyfiledialogs.c)
 file(COPY sprites DESTINATION ${CMAKE_BINARY_DIR})

@@ -73,12 +73,12 @@ int main() {
 
     ChangeDirectory(GetApplicationDirectory());
 
-    ComponentTextureEntry componentTextures[componentMetadata.size()];
+    std::vector<ComponentTextureEntry> componentTextures;
     for (int i = 0; i < componentMetadata.size(); i++) {
-        componentTextures[i] = ComponentTextureEntry{
+        componentTextures.push_back(ComponentTextureEntry{
                 componentMetadata[i],
                 LoadTexture(("sprites/" + componentMetadata[i].name + ".png").c_str()),
-        };
+        });
     }
 
     std::vector<PlacedComponent> placedComponents;
@@ -111,8 +111,8 @@ int main() {
                 DrawTexturePro(
                         componentTexture,
                         {0, 0, (float) componentTexture.width, (float) componentTexture.height},
-                        (Rectangle) {componentPos.x, componentPos.y, 64, 64},
-                        (Vector2) {0, 0},
+                        Rectangle{componentPos.x, componentPos.y, 64, 64},
+                        Vector2{0, 0},
                         0,
                         GRAY
                 );
@@ -128,9 +128,9 @@ int main() {
         }
         if (mode == 0) {
             GuiScrollPanel(
-                    (Rectangle) {0, 0, 200, (float) (GetScreenHeight())},
+                    Rectangle{0, 0, 200, (float) (GetScreenHeight())},
                     "Components",
-                    (Rectangle) {0, 0, 180, totalComponentListHeight},
+                    Rectangle{0, 0, 180, totalComponentListHeight},
                     &scrollPos
             );
             for (int i = 0; i < componentMetadata.size(); i++) {
@@ -140,15 +140,15 @@ int main() {
                         (float) (180 - 64) / 2,
                         (float) (i * 80) + 30 + scrollPos.y,
                 };
-                if (GuiButton((Rectangle) {runtimePosition.x, runtimePosition.y, 64, 64}, "x")) {
+                if (GuiButton(Rectangle{runtimePosition.x, runtimePosition.y, 64, 64}, "x")) {
                     selectedComponent = i;
                 }
                 DrawTexturePro(
                         componentTexture.texture,
-                        (Rectangle) {0, 0, (float) componentTexture.texture.width,
-                                     (float) componentTexture.texture.height},
-                        (Rectangle) {runtimePosition.x, runtimePosition.y, 64, 64},
-                        (Vector2) {0, 0},
+                        Rectangle{0, 0, (float) componentTexture.texture.width,
+                                  (float) componentTexture.texture.height},
+                        Rectangle{runtimePosition.x, runtimePosition.y, 64, 64},
+                        Vector2{0, 0},
                         0,
                         WHITE
                 );
@@ -173,7 +173,7 @@ int main() {
                             component.position.x + (float) input.x,
                             component.position.y + (float) input.y,
                     };
-                    if (Vector2Distance(inputPos, (Vector2) {(float) GetMouseX(), (float) GetMouseY()}) < 17) {
+                    if (Vector2Distance(inputPos, Vector2{(float) GetMouseX(), (float) GetMouseY()}) < 17) {
                         std::cout << "Input clicked at " << inputPos.x << ", " << inputPos.y << std::endl;
                         currentWireStart = inputPos;
                     }
@@ -181,15 +181,15 @@ int main() {
             }
         }
         for (const auto &comp: placedComponents) {
-            auto it = std::find_if(componentTextures, componentTextures + componentMetadata.size(),
+            auto it = std::find_if(componentTextures.begin(), componentTextures.end(),
                                    [&comp](const ComponentTextureEntry &entry) {
                                        return entry.metadata.name == comp.componentName;
                                    });
             DrawTexturePro(
                     it->texture,
                     {0, 0, (float) it->texture.width, (float) it->texture.height},
-                    (Rectangle) {comp.position.x, comp.position.y, 64, 64},
-                    (Vector2) {0, 0},
+                    Rectangle{comp.position.x, comp.position.y, 64, 64},
+                    Vector2{0, 0},
                     0,
                     WHITE
             );
@@ -225,7 +225,7 @@ int main() {
         if (mode == 2 && currentWireStart.x > 0 && currentWireStart.y > 0) {
             DrawLineEx(
                     currentWireStart,
-                    (Vector2) {(float) GetMouseX(), (float) GetMouseY()},
+                    Vector2{(float) GetMouseX(), (float) GetMouseY()},
                     2,
                     RED
             );
@@ -247,7 +247,7 @@ int main() {
                                 component.position.x + (float) output.x,
                                 component.position.y + (float) output.y,
                         };
-                        if (Vector2Distance(outputPos, (Vector2) {(float) GetMouseX(), (float) GetMouseY()}) < 17) {
+                        if (Vector2Distance(outputPos, Vector2{(float) GetMouseX(), (float) GetMouseY()}) < 17) {
                             std::cout << "Output clicked at " << outputPos.x << ", " << outputPos.y << std::endl;
                             wireConnections.push_back(WireConnection{
                                     currentWireStart,
@@ -284,13 +284,13 @@ int main() {
             }
         }
         for (int i = 0; i < 3; ++i) {
-            if (GuiButton((Rectangle) {250 + (float) i * 85, 0, 80, 40}, modes[i].c_str())) {
+            if (GuiButton(Rectangle{250 + (float) i * 85, 0, 80, 40}, modes[i].c_str())) {
                 std::cout << "Mode " << modes[i] << " selected" << std::endl;
                 mode = i;
             }
         }
         for (int i = 0; i < 2; ++i) {
-            if (GuiButton((Rectangle) {(float) GetScreenWidth() - (float) (i + 1) * 85 - 30, 0, 80, 40},
+            if (GuiButton(Rectangle{(float) GetScreenWidth() - (float) (i + 1) * 85 - 30, 0, 80, 40},
                           actions[i].c_str())) {
                 std::cout << "Action " << actions[i] << " selected" << std::endl;
                 if (actions[i] == "export") {
@@ -325,7 +325,9 @@ int main() {
         }
         DrawText(("Mode: " + modes[mode]).c_str(), 250 + 4 * 85, 10, 20, BLACK);
         if (mode == 0) {
-            DrawText(("Current component: " + (selectedComponent != -1 ? componentMetadata[selectedComponent].name : "None")).c_str(), 250 + 4 * 85, 30, 20, BLACK);
+            DrawText(("Current component: " +
+                      (selectedComponent != -1 ? componentMetadata[selectedComponent].name : "None")).c_str(),
+                     250 + 4 * 85, 30, 20, BLACK);
         }
         EndDrawing();
     }
