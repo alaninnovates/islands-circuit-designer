@@ -1,9 +1,9 @@
 #include "file_actions.h"
-#include "external/tinyfiledialogs.h"
+#include "lib/tinyfiledialogs/tinyfiledialogs.h"
 
 std::string show_open_file_dialog() {
 //    const char * filter[1] = {"*.iscd"};
-    char* file_name = tinyfd_openFileDialog(
+    char *file_name = tinyfd_openFileDialog(
             "Open Saved Circuit",
             "",
             0,
@@ -18,7 +18,7 @@ std::string show_open_file_dialog() {
 }
 
 std::string show_save_file_dialog(const char *filename) {
-    char* file_path = tinyfd_saveFileDialog("Save file", filename, 0, nullptr, nullptr);
+    char *file_path = tinyfd_saveFileDialog("Save file", filename, 0, nullptr, nullptr);
     if (file_path == nullptr) {
         return "";
     }

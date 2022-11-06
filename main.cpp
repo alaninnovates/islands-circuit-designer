@@ -6,12 +6,12 @@
 
 #define RAYGUI_IMPLEMENTATION
 
-#include "external/raygui.h"
+#include "lib/raygui/src/raygui.h"
 #include "component_metadata.h"
 #include "raymath.h"
 #include "nlohmann/json.hpp"
 #include "file_actions.h"
-#include "external/tinyfiledialogs.h"
+#include "lib/tinyfiledialogs/tinyfiledialogs.h"
 
 using json = nlohmann::json;
 
@@ -22,7 +22,7 @@ struct ComponentTextureEntry {
 
 struct PlacedComponent {
     std::string componentName;
-    Vector2 position;
+    Vector2 position{};
 };
 
 void to_json(json &j, const PlacedComponent &c) {
@@ -74,10 +74,10 @@ int main() {
     ChangeDirectory(GetApplicationDirectory());
 
     std::vector<ComponentTextureEntry> componentTextures;
-    for (int i = 0; i < componentMetadata.size(); i++) {
+    for (auto &c: componentMetadata) {
         componentTextures.push_back(ComponentTextureEntry{
-                componentMetadata[i],
-                LoadTexture(("sprites/" + componentMetadata[i].name + ".png").c_str()),
+                c,
+                LoadTexture(("sprites/" + c.name + ".png").c_str()),
         });
     }
 
@@ -268,18 +268,18 @@ int main() {
                 auto &component = placedComponents[i];
                 if (mousePos.x > component.position.x && mousePos.x < component.position.x + 64 &&
                     mousePos.y > component.position.y && mousePos.y < component.position.y + 64) {
-                    std::cout << "Component: " << component.componentName << " clicked at "
-                              << component.position.x << ", " << component.position.y << std::endl;
                     placedComponents.erase(placedComponents.begin() + i);
+                    std::cout << "Component: " << component.componentName << " deleted at "
+                              << component.position.x << ", " << component.position.y << std::endl;
                 }
             }
             for (int i = 0; i < wireConnections.size(); ++i) {
                 auto &wire = wireConnections[i];
                 if (mousePos.x > wire.start.x && mousePos.x < wire.end.x &&
                     mousePos.y > wire.start.y && mousePos.y < wire.end.y) {
-                    std::cout << "Wire: " << wire.start.x << ", " << wire.start.y << " -> "
-                              << wire.end.x << ", " << wire.end.y << std::endl;
                     wireConnections.erase(wireConnections.begin() + i);
+                    std::cout << "Wire: deleted at " << wire.start.x << ", " << wire.start.y << " -> "
+                              << wire.end.x << ", " << wire.end.y << std::endl;
                 }
             }
         }
